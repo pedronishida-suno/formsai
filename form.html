@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Formulário Sniper de IA — Suno 2026</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --suno-50:  #f0f7ff;
+    --suno-100: #e0effe;
+    --suno-600: #2563eb;
+    --suno-700: #1d4ed8;
+    --suno-900: #1e3a5f;
+    --amber-50:  #fffbeb;
+    --amber-100: #fef3c7;
+    --amber-600: #d97706;
+    --amber-700: #b45309;
+    --amber-800: #92400e;
+    --emerald-50:  #ecfdf5;
+    --emerald-200: #a7f3d0;
+    --emerald-700: #047857;
+    --emerald-900: #064e3b;
+    --red-50:  #fef2f2;
+    --red-200: #fecaca;
+    --red-700: #b91c1c;
+    --blue-50:  #eff6ff;
+    --blue-200: #bfdbfe;
+    --blue-700: #1d4ed8;
+    --gray-50:  #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f9fafb;
+    color: var(--gray-900);
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 48px 16px;
+  }
+
+  .container { max-width: 768px; margin: 0 auto; }
+
+  /* Header */
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--suno-900); color: #fff;
+    font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    padding: 4px 12px; border-radius: 999px; margin-bottom: 16px;
+  }
+  h1 { font-size: 30px; font-weight: 800; color: var(--gray-900); }
+  .subtitle { margin-top: 8px; font-size: 14px; color: var(--gray-500); }
+
+  /* Section label */
+  .section-head {
+    display: flex; align-items: center; gap: 12px;
+    margin: 40px 0 24px;
+  }
+  .section-tag {
+    font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 4px;
+    color: #fff; letter-spacing: .04em;
+  }
+  .section-tag.a { background: var(--suno-900); }
+  .section-tag.b { background: var(--gray-800); }
+  .section-label {
+    font-size: 13px; font-weight: 600; color: var(--gray-600);
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+
+  /* Cards */
+  .card {
+    background: #fff; border: 1px solid var(--gray-200);
+    border-radius: 12px; padding: 24px; margin-bottom: 24px;
+  }
+
+  /* Closed question */
+  .q-number { color: var(--suno-600); font-weight: 700; margin-right: 6px; }
+  .q-text { font-weight: 600; font-size: 15px; color: var(--gray-900); margin-bottom: 16px; line-height: 1.5; }
+
+  .option-list { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px; border-radius: 8px; border: 1px solid var(--gray-200);
+    cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .option:hover { border-color: var(--gray-300); background: var(--gray-50); }
+  .option.selected { border-color: var(--suno-600); background: var(--suno-50); }
+  .option input[type="radio"] { margin-top: 2px; accent-color: var(--suno-600); flex-shrink: 0; }
+  .option-letter { font-weight: 700; color: var(--gray-900); margin-right: 2px; }
+  .option-body { font-size: 14px; color: var(--gray-700); }
+
+  /* Open question */
+  .open-label { display: block; font-weight: 700; font-size: 13px; color: var(--suno-700); margin-bottom: 4px; }
+  .open-text { display: block; font-weight: 600; font-size: 15px; color: var(--gray-900); margin-bottom: 8px; line-height: 1.5; }
+  .open-hint { display: block; font-size: 12px; color: var(--gray-500); font-style: italic; margin-bottom: 12px; }
+  textarea {
+    width: 100%; border: 1px solid var(--gray-300); border-radius: 8px;
+    padding: 12px 16px; font-size: 14px; color: var(--gray-800);
+    resize: vertical; min-height: 120px;
+    font-family: inherit; transition: border-color .15s, box-shadow .15s;
+    outline: none;
+  }
+  textarea:focus { border-color: var(--suno-600); box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+  textarea.short { border-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245,158,11,.2); }
+  .char-row { display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px; color: var(--gray-400); }
+  .char-warn { color: #d97706; font-weight: 600; }
+
+  /* Rationale toggle */
+  .rationale-divider { border: none; border-top: 1px solid var(--gray-100); margin: 20px 0 0; }
+  .rationale-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; background: none; border: none; cursor: pointer;
+    padding: 12px 0 0; font-family: inherit;
+    color: var(--suno-700); font-size: 12px; font-weight: 600;
+    transition: color .15s;
+  }
+  .rationale-toggle:hover { color: var(--suno-900); }
+  .rationale-toggle-left { display: flex; align-items: center; gap: 8px; }
+  .toggle-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 4px;
+    background: var(--suno-100); color: var(--suno-700);
+    font-size: 10px; transition: background .15s;
+  }
+  .rationale-toggle:hover .toggle-icon { background: var(--suno-600); color: #fff; }
+  .toggle-action { font-size: 12px; color: var(--gray-400); font-weight: 400; }
+
+  /* Rationale panel */
+  .rationale-panel {
+    margin-top: 12px; border: 1px solid var(--suno-100);
+    border-radius: 8px; overflow: hidden;
+    display: none;
+  }
+  .rationale-panel.open { display: block; }
+  .rationale-row {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--suno-100);
+  }
+  .rationale-row:last-child { border-bottom: none; }
+  .rationale-row.dim   { background: var(--suno-50); }
+  .rationale-row.body  { background: #fff; }
+  .rationale-row.flags { background: var(--amber-50); border-top: 1px solid var(--amber-100); }
+  .rationale-eyebrow {
+    font-size: 10px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  .rationale-row.dim   .rationale-eyebrow { color: var(--suno-600); }
+  .rationale-row.body  .rationale-eyebrow { color: var(--gray-500); }
+  .rationale-row.flags .rationale-eyebrow { color: var(--amber-700); }
+  .rationale-dim-value { font-size: 14px; font-weight: 700; color: var(--suno-900); }
+  .rationale-text { font-size: 13px; color: var(--gray-700); line-height: 1.6; }
+  .flag-list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+  .flag-list li { display: flex; gap: 8px; font-size: 13px; color: var(--amber-800); line-height: 1.5; }
+  .flag-bullet { color: var(--amber-600); font-weight: 700; flex-shrink: 0; }
+
+  /* Submit area */
+  .submit-area { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; padding-bottom: 48px; margin-top: 8px; }
+  .submit-hint { font-size: 12px; color: var(--gray-400); text-align: right; }
+  .btn-submit {
+    background: var(--suno-900); color: #fff;
+    font-family: inherit; font-size: 15px; font-weight: 600;
+    padding: 12px 32px; border-radius: 8px; border: none; cursor: pointer;
+    transition: background .15s, opacity .15s;
+  }
+  .btn-submit:hover:not(:disabled) { background: var(--suno-700); }
+  .btn-submit:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* Result card */
+  #result { display: none; }
+  .result-main {
+    border-radius: 12px; border: 2px solid; padding: 32px;
+    text-align: center; margin-bottom: 24px;
+  }
+  .result-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--gray-500); margin-bottom: 8px; }
+  .result-score { font-size: 72px; font-weight: 900; line-height: 1; margin-bottom: 8px; }
+  .result-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px; border-radius: 999px; border: 1px solid;
+    font-weight: 600; font-size: 14px; margin-bottom: 16px;
+  }
+  .result-justification { font-size: 14px; color: var(--gray-600); max-width: 500px; margin: 0 auto; line-height: 1.6; }
+  .result-breakdown { background: #fff; border: 1px solid var(--gray-200); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .result-breakdown h2 { font-weight: 600; margin-bottom: 16px; }
+  .breakdown-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-left: 1px solid var(--gray-100); }
+  .breakdown-col { padding: 0 16px; border-right: 1px solid var(--gray-100); text-align: center; }
+  .breakdown-num { font-size: 28px; font-weight: 700; color: var(--gray-900); }
+  .breakdown-num span { font-size: 14px; font-weight: 400; color: var(--gray-500); }
+  .breakdown-desc { font-size: 12px; color: var(--gray-500); margin-top: 4px; line-height: 1.4; }
+  .breakdown-weight { font-weight: 600; color: var(--gray-700); }
+  .btn-reset {
+    background: none; border: none; cursor: pointer; font-family: inherit;
+    font-size: 13px; color: var(--gray-400); text-decoration: underline;
+    transition: color .15s; display: block; margin: 0 auto;
+  }
+  .btn-reset:hover { color: var(--gray-600); }
+
+  /* Error */
+  .error-box { background: var(--red-50); border: 1px solid var(--red-200); color: var(--red-700); font-size: 14px; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; display: none; }
+  .error-box.visible { display: block; }
+
+  @media (max-width: 600px) {
+    body { padding: 32px 12px; }
+    h1 { font-size: 24px; }
+    .breakdown-grid { grid-template-columns: 1fr; }
+    .breakdown-col { border-right: none; border-bottom: 1px solid var(--gray-100); padding: 12px 0; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ===== FORM ===== -->
+  <div id="form-view">
+
+    <div style="margin-bottom:40px">
+      <div class="badge">BÔNUS ANUAL 2026 — INDICADOR DE IA (10%)</div>
+      <h1>Formulário Sniper de IA</h1>
+      <p class="subtitle">Preenchimento obrigatório e individual. As respostas são processadas automaticamente por IA — seja específico e factual.</p>
+    </div>
+
+    <form id="sniper-form" novalidate>
+
+      <!-- PARTE A -->
+      <div class="section-head">
+        <span class="section-tag a">PARTE A</span>
+        <span class="section-label">Mapeamento e Contexto</span>
+      </div>
+
+      <!-- Q1 -->
+      <div class="card">
+        <p class="q-text"><span class="q-number">Q1.</span>Com qual frequência você utiliza Inteligência Artificial ativamente nas suas rotinas de trabalho na Suno?</p>
+        <div class="option-list" data-group="q1">
+          <label class="option"><input type="radio" name="q1" value="a" /><span class="option-body"><span class="option-letter">A)</span> Raramente — menos de 1x por semana / consultas pontuais.</span></label>
+          <label class="option"><input type="radio" name="q1" value="b" /><span class="option-body"><span class="option-letter">B)</span> Ocasionalmente — 1 a 2x por semana para tarefas específicas.</span></label>
+          <label class="option"><input type="radio" name="q1" value="c" /><span class="option-body"><span class="option-letter">C)</span> Frequentemente — quase todo dia, integrada a pelo menos uma rotina principal.</span></label>
+          <label class="option"><input type="radio" name="q1" value="d" /><span class="option-body"><span class="option-letter">D)</span> Intensamente — múltiplas vezes ao dia, base fundamental do meu fluxo de trabalho.</span></label>
+        </div>
+        <hr class="rationale-divider" />
+        <button type="button" class="rationale-toggle" data-target="r-q1">
+          <span class="rationale-toggle-left"><span class="toggle-icon">▼</span> O que o avaliador analisa nesta pergunta</span>
+          <span class="toggle-action">Ver racional</span>
+        </button>
+        <div class="rationale-panel" id="r-q1">
+          <div class="rationale-row dim">
+            <p class="rationale-eyebrow">Dimensão Avaliada</p>
+            <p class="rationale-dim-value">Hábito e regularidade de uso real</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Por que esta dimensão importa para a Suno</p>
+            <p class="rationale-text">Adoção de IA segue curva de aprendizado composto: quem usa diariamente acumula competência exponencial e gera ganho operacional mensurável; quem usa esporadicamente permanece num platô. Sem frequência real, o ganho de produtividade não aparece na métrica de Eficiência de Pessoal (Despesas com Pessoal / ROL) — que é o termômetro financeiro do modelo de bônus.</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Decisão que a resposta habilita</p>
+            <p class="rationale-text">O agregado das 300 respostas calibra a maturidade média da empresa. Se a maioria está nas opções A–B, o problema é de capacitação, não de avaliação — e o Comitê de Liderança precisa revisar o programa de treinamento antes de aplicar a curva forçada.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="card">
+        <p class="q-text"><span class="q-number">Q2.</span>Qual das alternativas abaixo melhor descreve a sua principal ferramenta de trabalho com IA este ano?</p>
+        <div class="option-list" data-group="q2">
+          <label class="option"><input type="radio" name="q2" value="a" /><span class="option-body"><span class="option-letter">A)</span> Consultas textuais básicas em ferramentas de mercado (ChatGPT, Claude, Gemini) sem personalização.</span></label>
+          <label class="option"><input type="radio" name="q2" value="b" /><span class="option-body"><span class="option-letter">B)</span> Uso de Co-workers institucionais ou assistentes nativos integrados em softwares da empresa.</span></label>
+          <label class="option"><input type="radio" name="q2" value="c" /><span class="option-body"><span class="option-letter">C)</span> Criação de Custom GPTs, parametrização de instruções customizadas ou uso de Skills internas na Suno.</span></label>
+          <label class="option"><input type="radio" name="q2" value="d" /><span class="option-body"><span class="option-letter">D)</span> Desenvolvimento de automações via projetos no Cloud, chamadas de API, scripts próprios ou fluxos agênticos.</span></label>
+        </div>
+        <hr class="rationale-divider" />
+        <button type="button" class="rationale-toggle" data-target="r-q2">
+          <span class="rationale-toggle-left"><span class="toggle-icon">▼</span> O que o avaliador analisa nesta pergunta</span>
+          <span class="toggle-action">Ver racional</span>
+        </button>
+        <div class="rationale-panel" id="r-q2">
+          <div class="rationale-row dim">
+            <p class="rationale-eyebrow">Dimensão Avaliada</p>
+            <p class="rationale-dim-value">Escada de sofisticação técnica: consumidor → construtor</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Por que esta dimensão importa para a Suno</p>
+            <p class="rationale-text">Cada degrau representa uma ordem de grandeza diferente de valor: (A) ChatGPT genérico = ganho individual não escalável, sem retenção de IP; (B) Co-workers institucionais = uso governado; (C) Skills internas = o colaborador gera IP institucional que outros consomem; (D) API / agentes / scripts = o colaborador constrói infraestrutura. É a pergunta com maior peso no Score Base (25%) porque alavancagem técnica é o ativo escasso — equipa uma pessoa para multiplicar a capacidade de várias.</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Decisão que a resposta habilita</p>
+            <p class="rationale-text">Identifica o núcleo de criadores técnicos (C+D) que sustenta o programa de IA Champions e a biblioteca interna de Skills. Esses perfis são prioridade de retenção — se saírem, levam conhecimento construtivo consigo. Também evita que a empresa pague o mesmo bônus para quem consome e para quem constrói.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="card">
+        <p class="q-text"><span class="q-number">Q3.</span>Qual foi a origem da solução de IA que você implementou para resolver o seu principal gargalo?</p>
+        <div class="option-list" data-group="q3">
+          <label class="option"><input type="radio" name="q3" value="a" /><span class="option-body"><span class="option-letter">A)</span> Utilizo apenas ferramentas e prompts padrão disponíveis publicamente.</span></label>
+          <label class="option"><input type="radio" name="q3" value="b" /><span class="option-body"><span class="option-letter">B)</span> Peguei uma solução desenvolvida por um colega ou IA Champion e repliquei na minha rotina.</span></label>
+          <label class="option"><input type="radio" name="q3" value="c" /><span class="option-body"><span class="option-letter">C)</span> Adaptei e personalizei uma solução existente para a realidade específica da minha cadeira.</span></label>
+          <label class="option"><input type="radio" name="q3" value="d" /><span class="option-body"><span class="option-letter">D)</span> Desenvolvi/arquiteturei uma solução totalmente nova (ou agente do zero) para o meu processo.</span></label>
+        </div>
+        <hr class="rationale-divider" />
+        <button type="button" class="rationale-toggle" data-target="r-q3">
+          <span class="rationale-toggle-left"><span class="toggle-icon">▼</span> O que o avaliador analisa nesta pergunta</span>
+          <span class="toggle-action">Ver racional</span>
+        </button>
+        <div class="rationale-panel" id="r-q3">
+          <div class="rationale-row dim">
+            <p class="rationale-eyebrow">Dimensão Avaliada</p>
+            <p class="rationale-dim-value">Autoria: replicador vs. adaptador vs. criador</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Por que esta dimensão importa para a Suno</p>
+            <p class="rationale-text">A Suno precisa de criadores (que geram IP e solucionam problemas inéditos) e de replicadores eficientes (que escalam inovação existente). Os dois papéis têm valor, mas precisam ser identificados separadamente para gestão de carreira. Sem essa pergunta, um colaborador que replicou a Skill do colega receberia o mesmo crédito de quem a criou — destruindo o incentivo a criar.</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Decisão que a resposta habilita</p>
+            <p class="rationale-text">Define o pipeline de IA Champions: criadores (C+D) são os candidatos naturais a liderar workshops, documentar Skills e mentorar pares. A opção D é requisito quase obrigatório para sustentar argumento na Banca de Validação do Top 20%.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="card">
+        <p class="q-text"><span class="q-number">Q4.</span>Onde a solução de IA foi implementada no seu fluxo de trabalho?</p>
+        <div class="option-list" data-group="q4">
+          <label class="option"><input type="radio" name="q4" value="a" /><span class="option-body"><span class="option-letter">A)</span> Em tarefas secundárias de suporte (correção gramatical, tradução, geração de ideias).</span></label>
+          <label class="option"><input type="radio" name="q4" value="b" /><span class="option-body"><span class="option-letter">B)</span> Na execução operacional de uma tarefa de rotina (e-mails pontuais, relatórios simples).</span></label>
+          <label class="option"><input type="radio" name="q4" value="c" /><span class="option-body"><span class="option-letter">C)</span> Na automação pontual de um processo recorrente (base de dados semanal, e-mails em lote).</span></label>
+          <label class="option"><input type="radio" name="q4" value="d" /><span class="option-body"><span class="option-letter">D)</span> Na reestruturação completa de um fluxo de trabalho (pipelines, governança automatizada, sistemas agênticos).</span></label>
+        </div>
+        <hr class="rationale-divider" />
+        <button type="button" class="rationale-toggle" data-target="r-q4">
+          <span class="rationale-toggle-left"><span class="toggle-icon">▼</span> O que o avaliador analisa nesta pergunta</span>
+          <span class="toggle-action">Ver racional</span>
+        </button>
+        <div class="rationale-panel" id="r-q4">
+          <div class="rationale-row dim">
+            <p class="rationale-eyebrow">Dimensão Avaliada</p>
+            <p class="rationale-dim-value">Profundidade de integração: suporte superficial vs. núcleo do processo</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Por que esta dimensão importa para a Suno</p>
+            <p class="rationale-text">IA em correção gramatical gera ganho marginal e invisível para o P&L. IA em pipelines e governança muda estrutura de custo. A métrica de Eficiência (Despesas com Pessoal / ROL) só é movida por ganhos no núcleo — não por produtividade cosmética. Sem essa pergunta, a empresa pagaria bônus por "produtividade" que não aparece em nenhum indicador financeiro.</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Decisão que a resposta habilita</p>
+            <p class="rationale-text">Cruzado com as chaves únicas do colaborador (CPF × Família × Canal × BU × UN): quem responde D em chaves de Receita ou Rentabilidade é candidato direto a case de replicação cross-BU no Painel do Jean.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="card">
+        <p class="q-text"><span class="q-number">Q5.</span>Se a solução de IA que você usa hoje fosse desativada amanhã, qual seria o impacto no escopo da sua cadeira?</p>
+        <div class="option-list" data-group="q5">
+          <label class="option"><input type="radio" name="q5" value="a" /><span class="option-body"><span class="option-letter">A)</span> Nenhum impacto. Meu trabalho continuaria no mesmo ritmo.</span></label>
+          <label class="option"><input type="radio" name="q5" value="b" /><span class="option-body"><span class="option-letter">B)</span> Impacto leve. Gastaria algumas horas a mais por semana.</span></label>
+          <label class="option"><input type="radio" name="q5" value="c" /><span class="option-body"><span class="option-letter">C)</span> Impacto moderado. Uma rotina importante atrasaria ou perderia qualidade.</span></label>
+          <label class="option"><input type="radio" name="q5" value="d" /><span class="option-body"><span class="option-letter">D)</span> Impacto crítico. A eficiência do meu escopo despencaria — meu processo principal depende disso.</span></label>
+        </div>
+        <hr class="rationale-divider" />
+        <button type="button" class="rationale-toggle" data-target="r-q5">
+          <span class="rationale-toggle-left"><span class="toggle-icon">▼</span> O que o avaliador analisa nesta pergunta</span>
+          <span class="toggle-action">Ver racional</span>
+        </button>
+        <div class="rationale-panel" id="r-q5">
+          <div class="rationale-row dim">
+            <p class="rationale-eyebrow">Dimensão Avaliada</p>
+            <p class="rationale-dim-value">Teste de remoção — a IA virou infraestrutura ou é acessório?</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Por que esta dimensão importa para a Suno</p>
+            <p class="rationale-text">O padrão-ouro em TI corporativa para medir valor de qualquer sistema é o teste de remoção: se a retirada não dói, o sistema é decorativo. Se a resposta for "nenhum impacto", o uso era performance social — não leverage real. Isso detecta cargo culting: uso de IA como sinalização de modernidade sem ganho operacional, que corrompe a métrica e fragiliza o discurso da liderança perante o Conselho.</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Decisão que a resposta habilita</p>
+            <p class="rationale-text">Opção D (impacto crítico) é o maior sinalizador de retenção prioritária do formulário inteiro. Esses colaboradores tornaram a IA parte da operação da sua cadeira — se saírem, levam infraestrutura. O RH cruza esse dado com o risco de turnover para priorizar planos de retenção.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTE B -->
+      <div class="section-head">
+        <span class="section-tag b">PARTE B</span>
+        <span class="section-label">Validação Qualitativa</span>
+      </div>
+
+      <!-- Q6 -->
+      <div class="card">
+        <label>
+          <span class="open-label">Q6 — Diagnóstico do Cenário Anterior</span>
+          <span class="open-text">Descreva com precisão o problema, gargalo ou ineficiência que existia na sua rotina antes da aplicação da IA. O que tornava esse processo custoso, lento ou propenso a erros?</span>
+          <span class="open-hint">Orientação: Seja específico. Indique o tempo gasto ou a frequência com que o problema ocorria (ex: "Gastava 6 horas toda sexta consolidando planilhas manuais...").</span>
+          <textarea name="q6" data-open placeholder="Escreva aqui..."></textarea>
+          <div class="char-row"><span class="char-warn" data-warn="q6"></span><span data-count="q6">0 chars</span></div>
+        </label>
+        <hr class="rationale-divider" />
+        <button type="button" class="rationale-toggle" data-target="r-q6">
+          <span class="rationale-toggle-left"><span class="toggle-icon">▼</span> O que o avaliador analisa nesta pergunta</span>
+          <span class="toggle-action">Ver racional</span>
+        </button>
+        <div class="rationale-panel" id="r-q6">
+          <div class="rationale-row dim">
+            <p class="rationale-eyebrow">Dimensão Avaliada</p>
+            <p class="rationale-dim-value">Baseline quantificável — existência real do problema</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Por que esta dimensão importa para a Suno</p>
+            <p class="rationale-text">Toda reivindicação de impacto exige um before/after falsificável. Q6 e Q8 formam um par contábil: Q6 é o débito (custo do problema), Q8 é o crédito (ganho da solução). Sem baseline quantificado — frequência, horas ou custo específico — qualquer ganho declarado em Q8 vira narrativa sem âncora e não pode ser auditado.</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Decisão que a resposta habilita</p>
+            <p class="rationale-text">O avaliador usa Q6 para verificar se o case foi construído com metodologia ou inventado retrospectivamente. A especificidade do problema descrito é diretamente proporcional à credibilidade de tudo que vem depois.</p>
+          </div>
+          <div class="rationale-row flags">
+            <p class="rationale-eyebrow">⚠ O que aciona penalização automática</p>
+            <ul class="flag-list">
+              <li><span class="flag-bullet">•</span><span>Resposta sem número ou frequência específica aciona a flag <strong>resposta_generica</strong> → rebaixamento automático de –0,5 ponto na nota qualitativa.</span></li>
+              <li><span class="flag-bullet">•</span><span>Descrição de problema que não corresponde à família de indicador do colaborador aciona <strong>incoerencia_escopo</strong>.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="card">
+        <label>
+          <span class="open-label">Q7 — Arquitetura da Solução</span>
+          <span class="open-text">Como a IA foi utilizada para resolver o problema citado acima? Explique o passo a passo da solução que você estruturou ou utilizou.</span>
+          <span class="open-hint">Orientação: Evite respostas vagas como "usei o ChatGPT para me ajudar". Explique a mecânica: qual ferramenta, qual estrutura de prompt/Skill, qual input recebe, qual output gera, qual regra de negócio está embarcada.</span>
+          <textarea name="q7" data-open placeholder="Escreva aqui..."></textarea>
+          <div class="char-row"><span class="char-warn" data-warn="q7"></span><span data-count="q7">0 chars</span></div>
+        </label>
+        <hr class="rationale-divider" />
+        <button type="button" class="rationale-toggle" data-target="r-q7">
+          <span class="rationale-toggle-left"><span class="toggle-icon">▼</span> O que o avaliador analisa nesta pergunta</span>
+          <span class="toggle-action">Ver racional</span>
+        </button>
+        <div class="rationale-panel" id="r-q7">
+          <div class="rationale-row dim">
+            <p class="rationale-eyebrow">Dimensão Avaliada</p>
+            <p class="rationale-dim-value">Domínio técnico real — o colaborador é dono ou apenas operador da solução?</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Por que esta dimensão importa para a Suno</p>
+            <p class="rationale-text">Quem não consegue explicar a mecânica não é dono da solução — está operando algo que não compreende. Em setor regulado (CVM), isso é risco de governança: o colaborador não consegue defender, auditar ou corrigir o que entrega via IA. Além disso, Q7 bem escrita é literalmente documentação técnica reutilizável — ao longo do ciclo, as melhores Q7s alimentam a biblioteca interna de Skills da Suno.</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Decisão que a resposta habilita</p>
+            <p class="rationale-text">É a pergunta que mais diferencia Top 20% de Mediana: Mediana descreve uso; Top descreve arquitetura. Diretamente confrontada com Q2: quem marcou "API/agentes" em Q2 e escreve Q7 vaga é o falso positivo mais perigoso do sistema — e o Claude tem instrução específica para detectar essa incoerência.</p>
+          </div>
+          <div class="rationale-row flags">
+            <p class="rationale-eyebrow">⚠ O que aciona penalização automática</p>
+            <ul class="flag-list">
+              <li><span class="flag-bullet">•</span><span>Ausência de ferramenta específica, regra de negócio ou formato de input/output aciona <strong>ausencia_mecanica</strong> → nota travada em 1,0 (Bottom automático).</span></li>
+              <li><span class="flag-bullet">•</span><span>Suspeita de resposta gerada por IA genérica sem conteúdo factual aciona <strong>resposta_generica</strong> → marcada para auditoria manual obrigatória.</span></li>
+              <li><span class="flag-bullet">•</span><span>2 ou 3 flags simultâneas: nota travada em 1,0 independente do Score Base + case enviado para revisão do CPTO.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="card">
+        <label>
+          <span class="open-label">Q8 — Evidência de Impacto e Ganhos Reais</span>
+          <span class="open-text">Descreva a situação atual do processo após a implementação. Quais foram os ganhos tangíveis de tempo (horas liberadas), de qualidade do output ou de redução de custos?</span>
+          <span class="open-hint">Orientação: O impacto deve ser proporcional à sua cadeira. Estagiário: foque nas horas economizadas na sua rotina. Analista/Gestor: foque no impacto do processo da subárea.</span>
+          <textarea name="q8" data-open placeholder="Escreva aqui..."></textarea>
+          <div class="char-row"><span class="char-warn" data-warn="q8"></span><span data-count="q8">0 chars</span></div>
+        </label>
+        <hr class="rationale-divider" />
+        <button type="button" class="rationale-toggle" data-target="r-q8">
+          <span class="rationale-toggle-left"><span class="toggle-icon">▼</span> O que o avaliador analisa nesta pergunta</span>
+          <span class="toggle-action">Ver racional</span>
+        </button>
+        <div class="rationale-panel" id="r-q8">
+          <div class="rationale-row dim">
+            <p class="rationale-eyebrow">Dimensão Avaliada</p>
+            <p class="rationale-dim-value">ROI individual proporcional ao cargo e à chave de indicador</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Por que esta dimensão importa para a Suno</p>
+            <p class="rationale-text">Esta é a pergunta que fecha o circuito econômico do formulário. O somatório de Q8 de 300 colaboradores, após auditoria, é o número que a Suno usará para defender o investimento em IA perante o Conselho e para calcular o impacto real na métrica Despesas com Pessoal / ROL. O avaliador compara o impacto declarado com o nível hierárquico para verificar proporcionalidade.</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Decisão que a resposta habilita</p>
+            <p class="rationale-text">Cases com Q8 robusta em chaves de Receita/EBITDA são candidatos diretos ao Painel do Jean como exemplos de replicação cross-BU. Casos com impacto desproporcional ao cargo — para cima ou para baixo — comprometem a credibilidade do agregado e são flagados.</p>
+          </div>
+          <div class="rationale-row flags">
+            <p class="rationale-eyebrow">⚠ O que aciona penalização automática</p>
+            <ul class="flag-list">
+              <li><span class="flag-bullet">•</span><span>Diretor declarando "2h economizadas em revisão de e-mail" → impacto pequeno demais → <strong>incoerencia_escopo</strong>.</span></li>
+              <li><span class="flag-bullet">•</span><span>Estagiário declarando "transformei o EBITDA de toda a BU" → impacto grande demais → <strong>incoerencia_escopo</strong>.</span></li>
+              <li><span class="flag-bullet">•</span><span>Ausência de número concreto (ex: "melhorei muito minha produtividade") → <strong>resposta_generica</strong>.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="card">
+        <label>
+          <span class="open-label">Q9 — Mitigação de Riscos e Casos de Exceção</span>
+          <span class="open-text">Explique como você garante a acurácia, segurança e revisão humana dos resultados gerados. O que você faz para que o output não contenha alucinações ou erros de processo?</span>
+          <span class="open-hint">Orientação: Detalhe seu processo de checagem ou os filtros de validação que você aplica antes de considerar a entrega concluída.</span>
+          <textarea name="q9" data-open placeholder="Escreva aqui..."></textarea>
+          <div class="char-row"><span class="char-warn" data-warn="q9"></span><span data-count="q9">0 chars</span></div>
+        </label>
+        <hr class="rationale-divider" />
+        <button type="button" class="rationale-toggle" data-target="r-q9">
+          <span class="rationale-toggle-left"><span class="toggle-icon">▼</span> O que o avaliador analisa nesta pergunta</span>
+          <span class="toggle-action">Ver racional</span>
+        </button>
+        <div class="rationale-panel" id="r-q9">
+          <div class="rationale-row dim">
+            <p class="rationale-eyebrow">Dimensão Avaliada</p>
+            <p class="rationale-dim-value">Maturidade operacional e consciência de falhas de IA</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Por que esta dimensão importa para a Suno</p>
+            <p class="rationale-text">Em uma gestora de investimentos, alucinação de IA não é inconveniência — é risco regulatório. Uma recomendação errada gerada por IA sem checagem pode resultar em sanção da CVM, processo de cliente ou exposição pública. Quem usa IA em rotina sensível sem processo de validação é um passivo operacional, não um ativo.</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Decisão que a resposta habilita</p>
+            <p class="rationale-text">Colaboradores de áreas sensíveis (research, advisory, compliance, jurídico) com Q9 vaga recebem sinalização independente para a área de Compliance — independente da nota final. O agregado de Q9 também alimenta o programa de governança de IA da Suno: as melhores práticas de checagem descritas aqui viram protocolo institucional.</p>
+          </div>
+          <div class="rationale-row flags">
+            <p class="rationale-eyebrow">⚠ O que aciona penalização automática</p>
+            <ul class="flag-list">
+              <li><span class="flag-bullet">•</span><span>Q9 vaga em colaborador de área regulada gera flag de atenção para o Compliance, fora do sistema de notas.</span></li>
+              <li><span class="flag-bullet">•</span><span>Não há rebaixamento automático de nota por Q9 fraca isoladamente — mas combina com outras flags para acionar auditoria manual.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="card">
+        <label>
+          <span class="open-label">Q10 — Justificativa de Diferenciação do Case</span>
+          <span class="open-text">Por que o seu uso de IA neste ano merece ser classificado como destaque (Top 20% ou Mediana)? O que diferencia sua abordagem de uma simples consulta automatizada?</span>
+          <span class="open-hint">Orientação: Seja honesto e específico. A banca de validação questionará ao vivo se você for indicado ao Top 20%.</span>
+          <textarea name="q10" data-open placeholder="Escreva aqui..."></textarea>
+          <div class="char-row"><span class="char-warn" data-warn="q10"></span><span data-count="q10">0 chars</span></div>
+        </label>
+        <hr class="rationale-divider" />
+        <button type="button" class="rationale-toggle" data-target="r-q10">
+          <span class="rationale-toggle-left"><span class="toggle-icon">▼</span> O que o avaliador analisa nesta pergunta</span>
+          <span class="toggle-action">Ver racional</span>
+        </button>
+        <div class="rationale-panel" id="r-q10">
+          <div class="rationale-row dim">
+            <p class="rationale-eyebrow">Dimensão Avaliada</p>
+            <p class="rationale-dim-value">Autoavaliação calibrada e aderência cultural ao modelo de curva</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Por que esta dimensão importa para a Suno</p>
+            <p class="rationale-text">A curva forçada 20-70-10 só funciona se a maioria entende e aceita que ser Mediana é positivo — não é punição, é o resultado esperado de quem faz o que se espera do cargo. Q10 obriga o colaborador a articular sua diferenciação em vez de deixar essa responsabilidade para o gestor (que tende à leniência). Se o colaborador não consegue articular por que é Top, ele provavelmente não é Top.</p>
+          </div>
+          <div class="rationale-row body">
+            <p class="rationale-eyebrow">Decisão que a resposta habilita</p>
+            <p class="rationale-text">Resposta genérica em Q10 sinaliza que o colaborador não internalizou a régua da empresa — é oportunidade de treinamento, não fraude. Esse dado, agregado por BU, mostra onde o programa de comunicação não foi eficaz e onde refazer o briefing.</p>
+          </div>
+          <div class="rationale-row flags">
+            <p class="rationale-eyebrow">⚠ O que aciona penalização automática</p>
+            <ul class="flag-list">
+              <li><span class="flag-bullet">•</span><span>Q10 que reivindica Top 20% sem critério técnico específico é cruzada com Q7 e Q8 — incoerência entre as três aciona revisão da nota.</span></li>
+              <li><span class="flag-bullet">•</span><span>A Banca de Validação usa Q10 como roteiro de perguntas ao vivo. Conteúdo diferente do demonstrado ao vivo → rebaixamento para Mediana, independente da nota do Claude.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div class="error-box" id="error-box"></div>
+
+      <!-- Submit -->
+      <div class="submit-area">
+        <p class="submit-hint" id="submit-hint">Preencha todas as questões fechadas e escreva ao menos 50 caracteres em cada resposta aberta.</p>
+        <button type="submit" class="btn-submit" id="btn-submit" disabled>Enviar Formulário</button>
+      </div>
+
+    </form>
+  </div><!-- /#form-view -->
+
+  <!-- ===== RESULT ===== -->
+  <div id="result"></div>
+
+</div><!-- /.container -->
+
+<script>
+(function () {
+  // ── Rationale toggles ───────────────────────────────────────────────
+  document.querySelectorAll('.rationale-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var panel = document.getElementById(btn.dataset.target);
+      var icon  = btn.querySelector('.toggle-icon');
+      var label = btn.querySelector('.toggle-action');
+      var open  = panel.classList.toggle('open');
+      icon.textContent  = open ? '▲' : '▼';
+      label.textContent = open ? 'Ocultar' : 'Ver racional';
+    });
+  });
+
+  // ── Radio highlight ─────────────────────────────────────────────────
+  document.querySelectorAll('input[type="radio"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      var group = document.querySelectorAll('input[name="' + radio.name + '"]');
+      group.forEach(function (r) {
+        r.closest('.option').classList.toggle('selected', r.checked);
+      });
+      checkValidity();
+    });
+  });
+
+  // ── Textarea char count ─────────────────────────────────────────────
+  document.querySelectorAll('textarea[data-open]').forEach(function (ta) {
+    ta.addEventListener('input', function () {
+      var name  = ta.name;
+      var len   = ta.value.trim().length;
+      var warn  = document.querySelector('[data-warn="' + name + '"]');
+      var count = document.querySelector('[data-count="' + name + '"]');
+      count.textContent = len + ' chars';
+      if (len > 0 && len < 50) {
+        ta.classList.add('short');
+        warn.textContent = 'Mínimo: 50 caracteres';
+      } else {
+        ta.classList.remove('short');
+        warn.textContent = '';
+      }
+      checkValidity();
+    });
+  });
+
+  // ── Validation ──────────────────────────────────────────────────────
+  function isValid() {
+    var closedOk = ['q1','q2','q3','q4','q5'].every(function (n) {
+      return document.querySelector('input[name="' + n + '"]:checked');
+    });
+    var openOk = ['q6','q7','q8','q9','q10'].every(function (n) {
+      var ta = document.querySelector('textarea[name="' + n + '"]');
+      return ta && ta.value.trim().length >= 50;
+    });
+    return closedOk && openOk;
+  }
+
+  function checkValidity() {
+    var btn  = document.getElementById('btn-submit');
+    var hint = document.getElementById('submit-hint');
+    var ok   = isValid();
+    btn.disabled = !ok;
+    hint.style.display = ok ? 'none' : 'block';
+  }
+
+  // ── Submit ──────────────────────────────────────────────────────────
+  document.getElementById('sniper-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!isValid()) return;
+
+    var btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.textContent = 'Processando avaliação...';
+
+    var payload = { collaborator: { name:'Colaborador', cpf_hash:'', cargo:'', nivel:'pleno', bu:'', un:'' } };
+    ['q1','q2','q3','q4','q5'].forEach(function (n) {
+      payload[n] = document.querySelector('input[name="' + n + '"]:checked').value;
+    });
+    ['q6','q7','q8','q9','q10'].forEach(function (n) {
+      payload[n] = document.querySelector('textarea[name="' + n + '"]').value;
+    });
+
+    fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function (res) {
+      return res.json().then(function (data) {
+        if (!res.ok) throw new Error(data.error || 'Erro ' + res.status);
+        return data;
+      });
+    })
+    .then(function (data) { renderResult(data); })
+    .catch(function (err) {
+      var box = document.getElementById('error-box');
+      box.textContent = err.message;
+      box.classList.add('visible');
+      btn.disabled = false;
+      btn.textContent = 'Enviar Formulário';
+    });
+  });
+
+  // ── Result render ────────────────────────────────────────────────────
+  var FAIXA = {
+    top:          { label:'Top 20%',      color:'#047857', bg:'#ecfdf5', border:'#6ee7b7' },
+    mediana:      { label:'Mediana',      color:'#1d4ed8', bg:'#eff6ff', border:'#93c5fd' },
+    mediana_ruim: { label:'Mediana-Ruim', color:'#b45309', bg:'#fffbeb', border:'#fcd34d' },
+    bottom:       { label:'Bottom',       color:'#b91c1c', bg:'#fef2f2', border:'#fca5a5' },
+  };
+  var FLAG_LABELS = {
+    resposta_generica:  'Resposta genérica / sem dados factuais',
+    incoerencia_escopo: 'Impacto incompatível com o escopo do cargo',
+    ausencia_mecanica:  'Ausência de detalhamento técnico da solução',
+  };
+
+  function renderResult(r) {
+    document.getElementById('form-view').style.display = 'none';
+    var f = FAIXA[r.faixa] || FAIXA.mediana;
+    var ev = r.evaluation;
+
+    var flagsHtml = '';
+    if (ev.flags_fraude && ev.flags_fraude.length) {
+      var items = ev.flags_fraude.map(function (fl) {
+        return '<li style="display:flex;gap:8px;font-size:14px;color:#b91c1c"><span>•</span><span>' + (FLAG_LABELS[fl] || fl) + '</span></li>';
+      }).join('');
+      flagsHtml = '<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:24px;margin-bottom:16px">'
+        + '<h2 style="font-weight:600;color:#991b1b;margin-bottom:12px">⚠ Flags de Atenção Detectadas</h2>'
+        + (ev.rebaixamento_aplicado ? '<p style="font-size:14px;color:#b91c1c;margin-bottom:12px">' + ev.rebaixamento_motivo + '</p>' : '')
+        + '<ul style="list-style:none;display:flex;flex-direction:column;gap:6px">' + items + '</ul></div>';
+    }
+
+    var posHtml = '';
+    if (ev.destaques_positivos && ev.destaques_positivos.length) {
+      posHtml = '<div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:20px">'
+        + '<h3 style="font-weight:600;color:#065f46;font-size:13px;margin-bottom:12px">Destaques Positivos</h3>'
+        + '<ul style="list-style:none;display:flex;flex-direction:column;gap:8px">'
+        + ev.destaques_positivos.map(function (d) { return '<li style="font-size:14px;color:#047857;display:flex;gap:8px"><span>✓</span><span>' + d + '</span></li>'; }).join('')
+        + '</ul></div>';
+    }
+    var impHtml = '';
+    if (ev.pontos_de_melhoria && ev.pontos_de_melhoria.length) {
+      impHtml = '<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:20px">'
+        + '<h3 style="font-weight:600;color:#374151;font-size:13px;margin-bottom:12px">Pontos de Melhoria</h3>'
+        + '<ul style="list-style:none;display:flex;flex-direction:column;gap:8px">'
+        + ev.pontos_de_melhoria.map(function (p) { return '<li style="font-size:14px;color:#4b5563;display:flex;gap:8px"><span>→</span><span>' + p + '</span></li>'; }).join('')
+        + '</ul></div>';
+    }
+
+    var topAlert = r.faixa === 'top'
+      ? '<div style="background:#064e3b;color:#fff;border-radius:12px;padding:20px;font-size:14px;margin-bottom:16px">'
+        + '<p style="font-weight:600;margin-bottom:4px">Você está no Top 20% preliminar.</p>'
+        + '<p style="color:#6ee7b7">Sua nota será validada em banca presencial. Prepare-se para demonstrar ao vivo a solução descrita — o Diretor e um IA Champion farão perguntas técnicas.</p>'
+        + '</div>'
+      : '';
+
+    var html =
+      '<div class="result-main" style="border-color:' + f.border + ';background:' + f.bg + '">'
+      + '<p class="result-label">Sua Nota Final — Indicador de IA 2026</p>'
+      + '<div class="result-score" style="color:' + f.color + '">' + r.nota_final + '</div>'
+      + '<div class="result-badge" style="border-color:' + f.border + ';color:' + f.color + '">' + f.label + ' — ' + r.percentual_bonus + '% do peso recebido</div>'
+      + '<p class="result-justification">' + ev.nota_justificada + '</p>'
+      + '</div>'
+
+      + '<div class="result-breakdown">'
+      + '<h2>Composição da Nota</h2>'
+      + '<div class="breakdown-grid">'
+      + '<div class="breakdown-col"><p class="breakdown-num">' + r.score_base + '<span>/10</span></p><p class="breakdown-desc">Score Base (Q1–Q5)<br><span class="breakdown-weight">peso 40%</span></p></div>'
+      + '<div class="breakdown-col"><p class="breakdown-num">' + r.nota_qualitativa + '<span>/5</span></p><p class="breakdown-desc">Avaliação Qualitativa<br><span class="breakdown-weight">peso 60%</span></p></div>'
+      + '<div class="breakdown-col"><p class="breakdown-num">' + r.nota_final + '<span>/5</span></p><p class="breakdown-desc">Nota Final<br><span class="breakdown-weight">ponderada</span></p></div>'
+      + '</div></div>'
+
+      + flagsHtml
+
+      + '<div class="result-breakdown">'
+      + '<h2>Análise de Consistência</h2>'
+      + '<p style="font-size:14px;color:#4b5563">' + ev.analise_consistencia + '</p>'
+      + '</div>'
+
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">' + posHtml + impHtml + '</div>'
+
+      + topAlert
+
+      + '<p style="font-size:12px;color:#9ca3af;text-align:center;margin-bottom:16px">Submetido em ' + new Date(r.submitted_at).toLocaleString('pt-BR') + (r.orbit_webhook_queued ? ' · Nota enviada ao Orbit' : '') + '</p>'
+      + '<button class="btn-reset" onclick="location.reload()">Preencher novamente (apenas para testes)</button>';
+
+    var el = document.getElementById('result');
+    el.innerHTML = html;
+    el.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  checkValidity();
+})();
+</script>
+</body>
+</html>

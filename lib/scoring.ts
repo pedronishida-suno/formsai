@@ -19,12 +19,12 @@ export function computeBaseScore(
 }
 
 /**
- * Final score: 40% base (scaled 1–5) + 60% qualitative (1–5).
+ * Final score: 30% base (scaled 1–5) + 40% qualitative IA (1–5) + 30% manager (1–5).
  * Returns 1–5 with one decimal.
  */
-export function computeFinalScore(baseScore: number, qualitativeScore: number): number {
+export function computeFinalScore(baseScore: number, qualitativeScore: number, gestorScore: number): number {
   const baseScaled = 1 + (baseScore / 10) * 4;
-  return Math.round((baseScaled * 0.4 + qualitativeScore * 0.6) * 10) / 10;
+  return Math.round((baseScaled * 0.3 + qualitativeScore * 0.4 + gestorScore * 0.3) * 10) / 10;
 }
 
 export function classifyScore(nota: number): { faixa: Faixa; percentual_bonus: number } {

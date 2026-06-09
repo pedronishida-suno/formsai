@@ -9,6 +9,10 @@ export type Nivel =
   | "gerente"
   | "diretor";
 
+export type PapelColaborador = "criador" | "adaptador" | "replicador" | "multiplicador";
+export type AmplitudeSolucao = "individual" | "subarea" | "area" | "cross_bu" | "empresa";
+export type GestorScore = 1 | 2 | 3 | 4 | 5;
+
 export interface Collaborator {
   name: string;
   cpf_hash: string;
@@ -20,18 +24,21 @@ export interface Collaborator {
 
 export interface SniperFormData {
   collaborator: Collaborator;
-  // Part A — closed
+  // Part A — fechadas (Q1–Q5): mapeamento e contexto
   q1: ClosedAnswer;
   q2: ClosedAnswer;
   q3: ClosedAnswer;
   q4: ClosedAnswer;
   q5: ClosedAnswer;
-  // Part B — open
+  // Part B — abertas do colaborador (Q6–Q8): problema, racional, impacto
   q6: string;
   q7: string;
   q8: string;
-  q9: string;
-  q10: string;
+  // Part C — avaliação do gestor (escala / lista)
+  gestor_papel: PapelColaborador;
+  gestor_amplitude: AmplitudeSolucao;
+  gestor_nota_case: GestorScore;
+  gestor_nota_protagonismo: GestorScore;
 }
 
 export type FraudFlag =
@@ -54,10 +61,11 @@ export type Faixa = "top" | "mediana" | "mediana_ruim" | "bottom";
 
 export interface SubmissionResult {
   score_base: number;        // 0–10, Q1–Q5
-  nota_qualitativa: number;  // 1–5, Claude
-  nota_final: number;        // 1–5, weighted
+  nota_qualitativa: number;  // 1–5, IA
+  nota_gestor: number;       // 1–5, média das notas do gestor
+  nota_final: number;        // 1–5, ponderada
   faixa: Faixa;
-  percentual_bonus: number;  // 100, 80, or 0
+  percentual_bonus: number;  // 100, 80 ou 0
   evaluation: ClaudeEvaluation;
   submitted_at: string;
   orbit_webhook_queued: boolean;

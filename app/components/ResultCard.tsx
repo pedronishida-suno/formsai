@@ -42,16 +42,20 @@ export function ResultCard({ result, onReset }: Props) {
         {/* Score breakdown */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h2 className="font-semibold text-gray-900 mb-4">Composição da Nota</h2>
-          <div className="grid grid-cols-3 divide-x divide-gray-100 text-center">
-            <div className="px-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-gray-100 text-center">
+            <div className="px-3 py-2">
               <p className="text-2xl font-bold text-gray-900">{result.score_base}<span className="text-sm font-normal text-gray-500">/10</span></p>
-              <p className="text-xs text-gray-500 mt-1">Score Base (Q1–Q5)<br/><span className="font-medium">peso 40%</span></p>
+              <p className="text-xs text-gray-500 mt-1">Score Base (Q1–Q5)<br/><span className="font-medium">peso 30%</span></p>
             </div>
-            <div className="px-4">
+            <div className="px-3 py-2">
               <p className="text-2xl font-bold text-gray-900">{result.nota_qualitativa}<span className="text-sm font-normal text-gray-500">/5</span></p>
-              <p className="text-xs text-gray-500 mt-1">Avaliação Qualitativa<br/><span className="font-medium">peso 60%</span></p>
+              <p className="text-xs text-gray-500 mt-1">Avaliação IA (Q6–Q8)<br/><span className="font-medium">peso 40%</span></p>
             </div>
-            <div className="px-4">
+            <div className="px-3 py-2">
+              <p className="text-2xl font-bold text-gray-900">{result.nota_gestor}<span className="text-sm font-normal text-gray-500">/5</span></p>
+              <p className="text-xs text-gray-500 mt-1">Nota do Gestor<br/><span className="font-medium">peso 30%</span></p>
+            </div>
+            <div className="px-3 py-2">
               <p className="text-2xl font-bold text-gray-900">{result.nota_final}<span className="text-sm font-normal text-gray-500">/5</span></p>
               <p className="text-xs text-gray-500 mt-1">Nota Final<br/><span className="font-medium">ponderada</span></p>
             </div>

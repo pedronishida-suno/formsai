@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import type { ClosedAnswer, SniperFormData, SubmissionResult } from "@/types/form";
+import type {
+  ClosedAnswer,
+  SniperFormData,
+  SubmissionResult,
+  PapelColaborador,
+  AmplitudeSolucao,
+  GestorScore,
+} from "@/types/form";
 import { ResultCard } from "@/app/components/ResultCard";
 import { QuestionRationale, type RationaleData } from "@/app/components/QuestionRationale";
 
@@ -44,9 +51,9 @@ const CLOSED_QUESTIONS: Array<{
     rationale: {
       dimension: "Escada de sofisticação técnica: consumidor → construtor",
       purpose:
-        "Cada degrau representa uma ordem de grandeza diferente de valor para a empresa: (A) ChatGPT genérico = ganho individual não escalável, sem retenção de IP; (B) Co-workers institucionais = uso governado; (C) Skills internas = o colaborador gera IP institucional que outros consomem; (D) API / agentes / scripts = o colaborador constrói infraestrutura. É a pergunta com maior peso no Score Base (25%) porque alavancagem técnica é o ativo escasso — equipa uma pessoa para multiplicar a capacidade de várias.",
+        "Cada degrau representa uma ordem de grandeza diferente de valor para a empresa: (A) ChatGPT genérico = ganho individual não escalável, sem retenção de IP; (B) Co-workers institucionais = uso governado; (C) Skills internas = o colaborador gera IP institucional que outros consomem; (D) API / agentes / scripts = o colaborador constrói infraestrutura. É a pergunta com maior peso no Score Base (25%) porque alavancagem técnica é o ativo escasso.",
       signal:
-        "Identifica o núcleo de criadores técnicos (C+D) que sustenta o programa de IA Champions e a biblioteca interna de Skills. Esses perfis são prioridade de retenção — se saírem, levam conhecimento construtivo consigo. Também evita que a empresa pague o mesmo bônus para quem consome e para quem constrói.",
+        "Identifica o núcleo de criadores técnicos (C+D) que sustenta o programa de IA Champions e a biblioteca interna de Skills. Esses perfis são prioridade de retenção.",
     },
   },
   {
@@ -61,9 +68,9 @@ const CLOSED_QUESTIONS: Array<{
     rationale: {
       dimension: "Autoria: replicador vs. adaptador vs. criador",
       purpose:
-        "A Suno precisa de criadores (que geram IP e solucionam problemas inéditos) e de replicadores eficientes (que escalam inovação existente). Os dois papéis têm valor, mas precisam ser identificados separadamente para gestão de carreira e composição de squads. Sem essa pergunta, um colaborador que replicou a Skill do colega receberia o mesmo crédito de quem a criou — destruindo o incentivo a criar.",
+        "A Suno precisa de criadores (que geram IP e solucionam problemas inéditos) e de replicadores eficientes (que escalam inovação existente). Os dois papéis têm valor, mas precisam ser identificados separadamente para gestão de carreira e composição de squads.",
       signal:
-        "Define o pipeline de IA Champions: criadores (C+D) são os candidatos naturais a liderar workshops, documentar Skills e mentora pares. A opção D é o requisito quase obrigatório para sustentar argumento na Banca de Validação do Top 20%.",
+        "Define o pipeline de IA Champions: criadores (C+D) são os candidatos naturais a liderar workshops, documentar Skills e mentorar pares.",
     },
   },
   {
@@ -78,9 +85,9 @@ const CLOSED_QUESTIONS: Array<{
     rationale: {
       dimension: "Profundidade de integração: suporte superficial vs. núcleo do processo",
       purpose:
-        "IA em correção gramatical gera ganho marginal e invisível para o P&L. IA em pipelines e governança muda estrutura de custo. A métrica de Eficiência (Despesas com Pessoal / ROL) só é movida por ganhos no núcleo — não por produtividade cosmética. Sem essa pergunta, a empresa pagaria bônus por 'produtividade' que não aparece em nenhum indicador financeiro.",
+        "IA em correção gramatical gera ganho marginal e invisível para o P&L. IA em pipelines e governança muda estrutura de custo. A métrica de Eficiência (Despesas com Pessoal / ROL) só é movida por ganhos no núcleo — não por produtividade cosmética.",
       signal:
-        "Cruzado com as chaves únicas do colaborador (CPF × Família × Canal × BU × UN): quem responde D em chaves de Receita ou Rentabilidade é o candidato direto a case de replicação cross-BU no Painel do Jean.",
+        "Cruzado com as chaves únicas do colaborador (CPF × Família × Canal × BU × UN): quem responde D em chaves de Receita ou Rentabilidade é o candidato direto a case de replicação cross-BU.",
     },
   },
   {
@@ -95,15 +102,15 @@ const CLOSED_QUESTIONS: Array<{
     rationale: {
       dimension: "Teste de remoção — a IA virou infraestrutura ou é acessório?",
       purpose:
-        "O padrão-ouro em TI corporativa para medir valor de qualquer sistema é o teste de remoção: se a retirada não dói, o sistema é decorativo. Aplicado à competência individual de IA, a lógica é a mesma. Se a resposta for 'nenhum impacto', o uso era performance social — não leverage real. Isso detecta cargo culting: uso de IA como sinalização de modernidade sem ganho operacional, que corrompe a métrica e fragiliza o discurso da liderança perante o Conselho.",
+        "O padrão-ouro em TI corporativa para medir valor de qualquer sistema é o teste de remoção: se a retirada não dói, o sistema é decorativo. Isso detecta cargo culting: uso de IA como sinalização de modernidade sem ganho operacional real.",
       signal:
-        "Opção D (impacto crítico) é o maior sinalizador de retenção prioritária do formulário inteiro. Esses colaboradores tornaram a IA parte da operação da sua cadeira — se saírem, levam infraestrutura. O RH cruza esse dado com o risco de turnover para priorizar planos de retenção.",
+        "Opção D (impacto crítico) é o maior sinalizador de retenção prioritária do formulário. Esses colaboradores tornaram a IA parte da operação da sua cadeira — se saírem, levam infraestrutura.",
     },
   },
 ];
 
 const OPEN_QUESTIONS: Array<{
-  id: "q6" | "q7" | "q8" | "q9" | "q10";
+  id: "q6" | "q7" | "q8";
   label: string;
   text: string;
   hint: string;
@@ -111,111 +118,105 @@ const OPEN_QUESTIONS: Array<{
 }> = [
   {
     id: "q6",
-    label: "Q6 — Diagnóstico do Cenário Anterior",
+    label: "Q6 — Diagnóstico do Problema",
     text: "Descreva com precisão o problema, gargalo ou ineficiência que existia na sua rotina antes da aplicação da IA. O que tornava esse processo custoso, lento ou propenso a erros?",
-    hint: "Seja específico. Indique o tempo gasto ou a frequência com que o problema ocorria (ex: 'Gastava 6 horas toda sexta consolidando planilhas manuais...').",
+    hint: "Seja específico. Indique o tempo gasto ou a frequência com que o problema ocorria (ex: 'Gastava 6h toda sexta consolidando planilhas manuais...').",
     rationale: {
       dimension: "Baseline quantificável — existência real do problema",
       purpose:
-        "Toda reivindicação de impacto exige um before/after falsificável. Q6 e Q8 formam um par contábil: Q6 é o débito (custo do problema), Q8 é o crédito (ganho da solução). Sem baseline quantificado aqui — com frequência, horas ou custo específico — qualquer ganho declarado em Q8 vira narrativa sem âncora e não pode ser auditado.",
+        "Toda reivindicação de impacto exige um before/after falsificável. Q6 é o débito (custo do problema), Q8 é o crédito (ganho da solução). Sem baseline quantificado com frequência, horas ou custo específico — qualquer ganho declarado em Q8 vira narrativa sem âncora.",
       signal:
-        "O avaliador usa Q6 para verificar se o case foi construído com metodologia ou inventado retrospectivamente para encaixar uma ferramenta já utilizada. A especificidade do problema descrito é diretamente proporcional à credibilidade de tudo que vem depois.",
+        "O avaliador usa Q6 para verificar se o case foi construído com metodologia ou inventado retrospectivamente. A especificidade do problema é diretamente proporcional à credibilidade do restante.",
       flagRisk: [
-        "Resposta sem número ou frequência específica (ex: 'tinha dificuldade com análises complexas') aciona a flag resposta_generica → rebaixamento automático de –0,5 ponto na nota qualitativa.",
-        "Descrição de problema que não corresponde à família de indicador do colaborador (ex: Analista de Compliance descrevendo problema de vendas) aciona incoerencia_escopo.",
+        "Resposta sem número ou frequência específica aciona a flag resposta_generica → rebaixamento automático de –0,5 ponto.",
+        "Problema incompatível com a área/cargo do colaborador aciona incoerencia_escopo.",
       ],
     },
   },
   {
     id: "q7",
-    label: "Q7 — Arquitetura da Solução",
-    text: "Como a IA foi utilizada para resolver o problema citado acima? Explique o passo a passo da solução que você estruturou ou utilizou.",
-    hint: "Evite respostas vagas como 'usei o ChatGPT para me ajudar'. Explique a mecânica: qual ferramenta, qual estrutura de prompt/Skill, qual input recebe, qual output gera, qual regra de negócio está embarcada.",
+    label: "Q7 — Racional e Mecânica de Uso",
+    text: "Qual foi o racional para escolher essa abordagem de IA? Explique o passo a passo da solução: qual ferramenta, como foi configurada, o que entra como input, o que sai como output e qual regra de negócio está embarcada.",
+    hint: "Evite respostas vagas como 'usei o ChatGPT para me ajudar'. Explique a mecânica e o porquê da escolha: ferramenta, estrutura de prompt/Skill, input, output, regra embarcada.",
     rationale: {
-      dimension: "Domínio técnico real — o colaborador é dono ou apenas operador da solução?",
+      dimension: "Domínio técnico real — o colaborador é dono ou apenas operador?",
       purpose:
-        "Quem não consegue explicar a mecânica não é dono da solução — está operando algo que não compreende. Em setor regulado (CVM), isso é risco de governança: o colaborador não consegue defender, auditar ou corrigir o que entrega via IA. Além disso, Q7 bem escrita é literalmente documentação técnica reutilizável — ao longo do ciclo, as melhores Q7s alimentam a biblioteca interna de Skills da Suno.",
+        "Quem não consegue explicar a mecânica não é dono da solução. Em setor regulado (CVM), isso é risco de governança. Além disso, Q7 bem escrita é documentação técnica reutilizável — as melhores alimentam a biblioteca interna de Skills da Suno.",
       signal:
-        "É a pergunta que mais diferencia Top 20% de Mediana: Mediana descreve uso; Top descreve arquitetura. Diretamente confrontada com Q2: quem marcou 'API/agentes' em Q2 e escreve Q7 vaga é o falso positivo mais perigoso do sistema — e o Claude tem instrução específica para detectar essa incoerência.",
+        "É a pergunta que mais diferencia Top 20% de Mediana: Mediana descreve uso; Top descreve arquitetura e racional.",
       flagRisk: [
-        "Ausência de menção a ferramenta específica, regra de negócio embarcada ou formato de input/output aciona ausencia_mecanica → nota travada em 1,0 (Bottom automático).",
-        "Suspeita de resposta gerada por IA genérica sem conteúdo factual da rotina do colaborador aciona resposta_generica e é marcada para auditoria manual obrigatória.",
-        "2 ou 3 flags simultâneas: nota travada em 1,0 independente do Score Base + case enviado para revisão do CPTO.",
+        "Ausência de ferramenta específica, regra de negócio ou formato de input/output aciona ausencia_mecanica → nota travada em 1,0.",
+        "Resposta que parece gerada por IA genérica sem conteúdo factual da rotina é marcada para auditoria manual.",
       ],
     },
   },
   {
     id: "q8",
-    label: "Q8 — Evidência de Impacto e Ganhos Reais",
+    label: "Q8 — Evidência de Impacto",
     text: "Descreva a situação atual do processo após a implementação. Quais foram os ganhos tangíveis de tempo (horas liberadas), de qualidade do output ou de redução de custos?",
     hint: "O impacto deve ser proporcional à sua cadeira. Estagiário: foque nas horas economizadas na sua rotina. Analista/Gestor: foque no impacto do processo da subárea.",
     rationale: {
       dimension: "ROI individual proporcional ao cargo e à chave de indicador",
       purpose:
-        "Esta é a pergunta que fecha o circuito econômico do formulário. O somatório de Q8 de 300 colaboradores, após auditoria, é o número que a Suno usará para defender o investimento em IA perante o Conselho e para calcular o impacto real na métrica Despesas com Pessoal / ROL. O avaliador compara o impacto declarado com o nível hierárquico do colaborador para verificar proporcionalidade.",
+        "Esta pergunta fecha o circuito econômico do formulário. O somatório de Q8 de 300 colaboradores, após auditoria, é o número que a Suno usará para defender o investimento em IA perante o Conselho.",
       signal:
-        "Cases com Q8 robusta em chaves de Receita/EBITDA são candidatos diretos ao Painel do Jean como exemplos de replicação cross-BU. Casos com impacto desproporcional ao cargo — para cima ou para baixo — comprometem a credibilidade do agregado e são flagados.",
+        "Cases com Q8 robusta em chaves de Receita/EBITDA são candidatos ao Painel do Jean como exemplos de replicação cross-BU.",
       flagRisk: [
         "Diretor declarando '2h economizadas em revisão de e-mail' → impacto pequeno demais para o cargo → incoerencia_escopo.",
-        "Estagiário declarando 'transformei o EBITDA de toda a BU' → impacto grande demais para o cargo → incoerencia_escopo.",
-        "Ausência de número concreto (ex: 'melhorei muito minha produtividade') → resposta_generica.",
-      ],
-    },
-  },
-  {
-    id: "q9",
-    label: "Q9 — Mitigação de Riscos e Casos de Exceção",
-    text: "Explique como você garante a acurácia, segurança e revisão humana dos resultados gerados. O que você faz para que o output não contenha alucinações ou erros de processo?",
-    hint: "Detalhe seu processo de checagem ou os filtros de validação que você aplica antes de considerar a entrega concluída.",
-    rationale: {
-      dimension: "Maturidade operacional e consciência de falhas de IA",
-      purpose:
-        "Em uma gestora de investimentos, alucinação de IA não é inconveniência — é risco regulatório. Uma recomendação errada gerada por IA sem checagem pode resultar em sanção da CVM, processo de cliente ou exposição pública. Quem usa IA em rotina sensível sem processo de validação é um passivo operacional, não um ativo. Diferentemente de outros setores, na Suno essa pergunta tem peso implícito de compliance.",
-      signal:
-        "Colaboradores de áreas sensíveis (research, advisory, compliance, jurídico) com Q9 vaga recebem sinalização independente para a área de Compliance — independente da nota final do formulário. O agregado de Q9 também alimenta o programa de governança de IA da Suno: as melhores práticas de checagem descritas aqui viram protocolo institucional.",
-      flagRisk: [
-        "Q9 completamente ausente ou vaga ('reviso o output antes de enviar') em colaborador de área regulada gera flag de atenção para o Compliance, fora do sistema de notas.",
-        "Não há rebaixamento automático de nota por Q9 fraca isoladamente — mas combina com outras flags para acionar auditoria manual.",
-      ],
-    },
-  },
-  {
-    id: "q10",
-    label: "Q10 — Justificativa de Diferenciação do Case",
-    text: "Por que o seu uso de IA neste ano merece ser classificado como destaque (Top 20% ou Mediana)? O que diferencia sua abordagem de uma simples consulta automatizada?",
-    hint: "Seja honesto e específico. A banca de validação questionará ao vivo se você for indicado ao Top 20%.",
-    rationale: {
-      dimension: "Autoavaliação calibrada e aderência cultural ao modelo de curva",
-      purpose:
-        "A curva forçada 20-70-10 só funciona se a maioria entende e aceita que ser Mediana é positivo — não é punição, é o resultado esperado de quem faz o que se espera do cargo. Q10 obriga o colaborador a articular sua diferenciação em vez de deixar essa responsabilidade para o gestor (que tende à leniência). Se o colaborador não consegue articular por que é Top, ele provavelmente não é Top. Isso também é o roteiro direto para a Banca de Validação presencial.",
-      signal:
-        "Resposta genérica em Q10 ('me dedico muito à IA e sempre busco inovação') sinaliza que o colaborador não internalizou a régua da empresa — é oportunidade de treinamento, não fraude. Esse dado, agregado por BU, mostra onde o programa de comunicação do lançamento não foi eficaz e onde refazer o briefing.",
-      flagRisk: [
-        "Q10 que reivindica Top 20% sem critério técnico específico (sem nomear mecânica, ferramenta ou impacto concreto) é cruzada com Q7 e Q8 — incoerência entre as três aciona revisão da nota.",
-        "A Banca de Validação usará Q10 como roteiro de perguntas ao vivo. O colaborador que escrever algo diferente do que demonstra ao vivo é rebaixado para Mediana independente da nota do Claude.",
+        "Ausência de número concreto → resposta_generica.",
       ],
     },
   },
 ];
 
 // ---------------------------------------------------------------------------
+// Manager question definitions
+// ---------------------------------------------------------------------------
+
+const PAPEL_OPTIONS: Array<{ value: PapelColaborador; label: string; description: string }> = [
+  { value: "replicador",    label: "Replicador",    description: "Adotou solução pronta desenvolvida por outro colaborador ou Champion." },
+  { value: "adaptador",     label: "Adaptador",     description: "Personalizou solução existente para sua cadeira específica." },
+  { value: "criador",       label: "Criador",       description: "Desenvolveu solução nova (Skill, agente, script ou fluxo próprio)." },
+  { value: "multiplicador", label: "Multiplicador", description: "Criou solução adotada por outros colaboradores ou áreas." },
+];
+
+const AMPLITUDE_OPTIONS: Array<{ value: AmplitudeSolucao; label: string; description: string }> = [
+  { value: "individual", label: "Individual",   description: "Impacto restrito à própria rotina do colaborador." },
+  { value: "subarea",    label: "Subárea",      description: "Adotada por membros diretos da mesma subárea." },
+  { value: "area",       label: "Área",         description: "Replicável ou já replicada em toda a área/equipe." },
+  { value: "cross_bu",   label: "Cross-BU",     description: "Extrapolou a área e foi adotada em outra BU ou canal." },
+  { value: "empresa",    label: "Empresa",      description: "Solução estratégica adotada ou recomendada para toda a Suno." },
+];
+
+const GESTOR_SCALE: Array<{ value: GestorScore; label: string }> = [
+  { value: 1, label: "1 — Muito baixo" },
+  { value: 2, label: "2 — Abaixo do esperado" },
+  { value: 3, label: "3 — Adequado" },
+  { value: 4, label: "4 — Acima do esperado" },
+  { value: 5, label: "5 — Excepcional" },
+];
+
+// ---------------------------------------------------------------------------
 // Default collaborator (in production: injected via Orbit SSO/JWT query params)
 // ---------------------------------------------------------------------------
 
-const DEFAULT_COLLABORATOR = {
-  name: "Colaborador",
-  cpf_hash: "",
-  cargo: "",
-  nivel: "pleno" as const,
-  bu: "",
-  un: "",
-};
+const NIVEL_OPTIONS: Array<{ value: import("@/types/form").Nivel; label: string }> = [
+  { value: "estagiario",   label: "Estagiário" },
+  { value: "junior",       label: "Júnior" },
+  { value: "pleno",        label: "Pleno" },
+  { value: "senior",       label: "Sênior" },
+  { value: "especialista", label: "Especialista" },
+  { value: "gerente",      label: "Gerente" },
+  { value: "diretor",      label: "Diretor" },
+];
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
 type FormState = {
+  cargo: string;
+  nivel: import("@/types/form").Nivel;
   q1: ClosedAnswer | "";
   q2: ClosedAnswer | "";
   q3: ClosedAnswer | "";
@@ -224,13 +225,20 @@ type FormState = {
   q6: string;
   q7: string;
   q8: string;
-  q9: string;
-  q10: string;
+  gestor_papel: PapelColaborador | "";
+  gestor_amplitude: AmplitudeSolucao | "";
+  gestor_nota_case: GestorScore | 0;
+  gestor_nota_protagonismo: GestorScore | 0;
 };
 
 const EMPTY_FORM: FormState = {
+  cargo: "", nivel: "pleno",
   q1: "", q2: "", q3: "", q4: "", q5: "",
-  q6: "", q7: "", q8: "", q9: "", q10: "",
+  q6: "", q7: "", q8: "",
+  gestor_papel: "",
+  gestor_amplitude: "",
+  gestor_nota_case: 0,
+  gestor_nota_protagonismo: 0,
 };
 
 export default function SniperForm() {
@@ -253,18 +261,20 @@ export default function SniperForm() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function setOpenAnswer(key: "q6" | "q7" | "q8" | "q9" | "q10", value: string) {
+  function setOpenAnswer(key: "q6" | "q7" | "q8", value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
   function isFormValid(): boolean {
-    const closedComplete = ["q1", "q2", "q3", "q4", "q5"].every(
-      (k) => form[k as keyof FormState] !== ""
-    );
-    const openComplete = ["q6", "q7", "q8", "q9", "q10"].every(
-      (k) => (form[k as keyof FormState] as string).trim().length >= 50
-    );
-    return closedComplete && openComplete;
+    if (!form.cargo.trim()) return false;
+    const closedComplete = (["q1", "q2", "q3", "q4", "q5"] as const).every((k) => form[k] !== "");
+    const openComplete = (["q6", "q7", "q8"] as const).every((k) => form[k].trim().length >= 50);
+    const gestorComplete =
+      form.gestor_papel !== "" &&
+      form.gestor_amplitude !== "" &&
+      form.gestor_nota_case !== 0 &&
+      form.gestor_nota_protagonismo !== 0;
+    return closedComplete && openComplete && gestorComplete;
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -275,10 +285,26 @@ export default function SniperForm() {
     setError(null);
 
     const payload: SniperFormData = {
-      collaborator: DEFAULT_COLLABORATOR,
-      ...(form as Omit<FormState, "q1"|"q2"|"q3"|"q4"|"q5"> & {
-        q1: ClosedAnswer; q2: ClosedAnswer; q3: ClosedAnswer; q4: ClosedAnswer; q5: ClosedAnswer;
-      }),
+      collaborator: {
+        name: "Colaborador",
+        cpf_hash: "",
+        cargo: form.cargo.trim(),
+        nivel: form.nivel,
+        bu: "",
+        un: "",
+      },
+      q1: form.q1 as ClosedAnswer,
+      q2: form.q2 as ClosedAnswer,
+      q3: form.q3 as ClosedAnswer,
+      q4: form.q4 as ClosedAnswer,
+      q5: form.q5 as ClosedAnswer,
+      q6: form.q6,
+      q7: form.q7,
+      q8: form.q8,
+      gestor_papel: form.gestor_papel as PapelColaborador,
+      gestor_amplitude: form.gestor_amplitude as AmplitudeSolucao,
+      gestor_nota_case: form.gestor_nota_case as GestorScore,
+      gestor_nota_protagonismo: form.gestor_nota_protagonismo as GestorScore,
     };
 
     try {
@@ -313,20 +339,51 @@ export default function SniperForm() {
           <div className="inline-flex items-center gap-2 bg-suno-900 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">
             BÔNUS ANUAL 2026 — INDICADOR DE IA (10%)
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Formulário Sniper de IA</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Formulário de Avaliação de IA</h1>
           <p className="mt-2 text-gray-500 text-sm">
-            Preenchimento obrigatório e individual. As respostas são processadas automaticamente
-            por IA — seja específico e factual.
+            Preenchimento em duas camadas: o colaborador responde as Partes A e B; o gestor direto preenche a Parte C.
+            As respostas são processadas automaticamente por IA — seja específico e factual.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-10">
-          {/* Part A */}
+          {/* Identificação */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Identificação</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Cargo / Função <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.cargo}
+                  onChange={(e) => setForm((prev) => ({ ...prev, cargo: e.target.value }))}
+                  placeholder="Ex: Analista de Research, Crédito Privado"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-suno-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nível</label>
+                <select
+                  value={form.nivel}
+                  onChange={(e) => setForm((prev) => ({ ...prev, nivel: e.target.value as import("@/types/form").Nivel }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-suno-500"
+                >
+                  {NIVEL_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Part A — Mapeamento */}
           <section>
             <div className="flex items-center gap-3 mb-6">
               <span className="bg-suno-900 text-white text-xs font-bold px-3 py-1 rounded">PARTE A</span>
               <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                Mapeamento e Contexto
+                Mapeamento e Contexto — preenchido pelo colaborador
               </span>
             </div>
 
@@ -377,12 +434,12 @@ export default function SniperForm() {
             </div>
           </section>
 
-          {/* Part B */}
+          {/* Part B — Colaborador open questions */}
           <section>
             <div className="flex items-center gap-3 mb-6">
               <span className="bg-gray-800 text-white text-xs font-bold px-3 py-1 rounded">PARTE B</span>
               <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                Validação Qualitativa
+                Diagnóstico, Racional e Impacto — preenchido pelo colaborador
               </span>
             </div>
 
@@ -427,6 +484,173 @@ export default function SniperForm() {
             </div>
           </section>
 
+          {/* Part C — Manager evaluation */}
+          <section>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="bg-indigo-700 text-white text-xs font-bold px-3 py-1 rounded">PARTE C</span>
+              <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                Avaliação do Gestor Direto
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 mb-6">
+              Esta seção é preenchida exclusivamente pelo gestor direto do colaborador, após a leitura das respostas das Partes A e B.
+            </p>
+
+            <div className="space-y-6">
+              {/* C1 — Papel do colaborador */}
+              <div className="bg-indigo-50 rounded-xl border border-indigo-200 p-6">
+                <p className="font-semibold text-gray-900 mb-1">
+                  <span className="text-indigo-700 mr-2">C1.</span>
+                  Qual melhor descreve o papel deste colaborador na solução de IA apresentada?
+                </p>
+                <p className="text-xs text-gray-500 mb-4 italic">
+                  Considere o protagonismo real, não o cargo. Um estagiário que criou uma Skill adotada pela equipe é Multiplicador.
+                </p>
+                <div className="space-y-3">
+                  {PAPEL_OPTIONS.map((opt) => {
+                    const selected = form.gestor_papel === opt.value;
+                    return (
+                      <label
+                        key={opt.value}
+                        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                          selected
+                            ? "border-indigo-600 bg-white"
+                            : "border-indigo-100 bg-white hover:border-indigo-300"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="gestor_papel"
+                          value={opt.value}
+                          checked={selected}
+                          onChange={() => setForm((prev) => ({ ...prev, gestor_papel: opt.value }))}
+                          className="mt-0.5 accent-indigo-600 shrink-0"
+                        />
+                        <span className="text-sm text-gray-700">
+                          <span className="font-semibold text-gray-900 mr-1">{opt.label}:</span>
+                          {opt.description}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* C2 — Amplitude da solução */}
+              <div className="bg-indigo-50 rounded-xl border border-indigo-200 p-6">
+                <p className="font-semibold text-gray-900 mb-1">
+                  <span className="text-indigo-700 mr-2">C2.</span>
+                  Qual foi a amplitude de alcance da solução implementada?
+                </p>
+                <p className="text-xs text-gray-500 mb-4 italic">
+                  Considere o alcance real verificado — não o potencial declarado pelo colaborador.
+                </p>
+                <div className="space-y-3">
+                  {AMPLITUDE_OPTIONS.map((opt) => {
+                    const selected = form.gestor_amplitude === opt.value;
+                    return (
+                      <label
+                        key={opt.value}
+                        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                          selected
+                            ? "border-indigo-600 bg-white"
+                            : "border-indigo-100 bg-white hover:border-indigo-300"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="gestor_amplitude"
+                          value={opt.value}
+                          checked={selected}
+                          onChange={() => setForm((prev) => ({ ...prev, gestor_amplitude: opt.value }))}
+                          className="mt-0.5 accent-indigo-600 shrink-0"
+                        />
+                        <span className="text-sm text-gray-700">
+                          <span className="font-semibold text-gray-900 mr-1">{opt.label}:</span>
+                          {opt.description}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* C3 — Confiabilidade do case */}
+              <div className="bg-indigo-50 rounded-xl border border-indigo-200 p-6">
+                <p className="font-semibold text-gray-900 mb-1">
+                  <span className="text-indigo-700 mr-2">C3.</span>
+                  Quão confiável e verificável é o case apresentado pelo colaborador?
+                </p>
+                <p className="text-xs text-gray-500 mb-4 italic">
+                  Avalie se os fatos descritos condizem com o que você observou no dia a dia do colaborador.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  {GESTOR_SCALE.map((opt) => {
+                    const selected = form.gestor_nota_case === opt.value;
+                    return (
+                      <label
+                        key={opt.value}
+                        className={`flex flex-col items-center gap-1 p-3 rounded-lg border cursor-pointer transition-colors text-center ${
+                          selected
+                            ? "border-indigo-600 bg-white font-semibold text-indigo-700"
+                            : "border-indigo-100 bg-white hover:border-indigo-300 text-gray-600"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="gestor_nota_case"
+                          value={opt.value}
+                          checked={selected}
+                          onChange={() => setForm((prev) => ({ ...prev, gestor_nota_case: opt.value }))}
+                          className="sr-only"
+                        />
+                        <span className="text-xl font-bold">{opt.value}</span>
+                        <span className="text-xs leading-tight">{opt.label.split(" — ")[1]}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* C4 — Nota de protagonismo */}
+              <div className="bg-indigo-50 rounded-xl border border-indigo-200 p-6">
+                <p className="font-semibold text-gray-900 mb-1">
+                  <span className="text-indigo-700 mr-2">C4.</span>
+                  Considerando o conjunto, qual nota você atribui ao protagonismo deste colaborador no uso de IA este ano?
+                </p>
+                <p className="text-xs text-gray-500 mb-4 italic">
+                  Esta é sua avaliação síntese como gestor — pondere frequência, qualidade, impacto e iniciativa.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  {GESTOR_SCALE.map((opt) => {
+                    const selected = form.gestor_nota_protagonismo === opt.value;
+                    return (
+                      <label
+                        key={opt.value}
+                        className={`flex flex-col items-center gap-1 p-3 rounded-lg border cursor-pointer transition-colors text-center ${
+                          selected
+                            ? "border-indigo-600 bg-white font-semibold text-indigo-700"
+                            : "border-indigo-100 bg-white hover:border-indigo-300 text-gray-600"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="gestor_nota_protagonismo"
+                          value={opt.value}
+                          checked={selected}
+                          onChange={() => setForm((prev) => ({ ...prev, gestor_nota_protagonismo: opt.value }))}
+                          className="sr-only"
+                        />
+                        <span className="text-xl font-bold">{opt.value}</span>
+                        <span className="text-xs leading-tight">{opt.label.split(" — ")[1]}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Error */}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
@@ -438,7 +662,7 @@ export default function SniperForm() {
           <div className="flex flex-col items-end gap-3 pb-12">
             {!isFormValid() && (
               <p className="text-xs text-gray-400">
-                Preencha todas as questões fechadas e escreva ao menos 50 caracteres em cada resposta aberta.
+                Preencha todas as seções: questões fechadas, respostas abertas (mín. 50 caracteres) e avaliação do gestor.
               </p>
             )}
             <button

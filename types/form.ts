@@ -30,10 +30,9 @@ export interface SniperFormData {
   q3: ClosedAnswer;
   q4: ClosedAnswer;
   q5: ClosedAnswer;
-  // Part B — abertas do colaborador (Q6–Q8): problema, racional, impacto
+  // Part B — abertas do colaborador (Q6–Q7): visão geral dos 3 usos + mecânica detalhada
   q6: string;
   q7: string;
-  q8: string;
   // Part C — avaliação do gestor (escala / lista)
   gestor_papel: PapelColaborador;
   gestor_amplitude: AmplitudeSolucao;

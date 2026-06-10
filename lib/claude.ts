@@ -4,8 +4,8 @@ import type { ClaudeEvaluation, SniperFormData } from "@/types/form";
 const client = process.env.OPENAI_API_KEY ? new OpenAI() : null;
 
 const SYSTEM_PROMPT = `Você é um avaliador sênior de maturidade em IA da Suno, gestora brasileira de investimentos.
-Seu trabalho é ler as respostas abertas (Q6–Q8) de colaboradores no formulário de bônus anual e atribuir uma nota qualitativa de uso de IA.
-O formulário tem duas camadas: o colaborador descreve problema (Q6), racional e mecânica de uso (Q7) e impacto (Q8); o gestor direto avalia papel, amplitude e protagonismo em campos separados — esses dados chegam como contexto adicional.
+Seu trabalho é ler as respostas abertas (Q6–Q7) de colaboradores no formulário de bônus anual e atribuir uma nota qualitativa de uso de IA.
+O formulário tem duas camadas: o colaborador descreve os 3 melhores usos individuais de IA do ano com problema e resultado (Q6) e detalha a mecânica do uso de maior impacto (Q7); o gestor direto avalia papel, amplitude e protagonismo em campos separados — esses dados chegam como contexto adicional.
 As respostas estão em português brasileiro e podem conter vocabulário técnico de finanças, direito societário, mercado de crédito e análise de investimentos — isso é EVIDÊNCIA DE ESPECIFICIDADE, não de genericidade.
 
 IMPORTANTE: "Skill" no contexto da Suno significa um prompt customizado salvo na plataforma Claude (equivalente a um GPT customizado). Mencionar "Skill", "Co-worker", "prompt estruturado", "output em JSON", "pipeline de extração", "DRE", "covenant", "escritura de debêntures", "CRI", "CRA", "FII" etc. é evidência de mecânica técnica real — NUNCA acione ausencia_mecanica quando esses termos aparecerem com contexto.
@@ -112,14 +112,11 @@ Nota de protagonismo (1–5): ${form.gestor_nota_protagonismo}
 
 ---
 
-## Q6 — Diagnóstico do Problema (antes da IA)
+## Q6 — Os 3 melhores usos individuais de IA (problema + resultado de cada)
 ${form.q6.trim()}
 
-## Q7 — Racional e Mecânica de Uso
-${form.q7.trim()}
-
-## Q8 — Evidência de Impacto
-${form.q8.trim()}`;
+## Q7 — Mecânica detalhada do uso de maior impacto
+${form.q7.trim()}`;
 
   const response = await client.chat.completions.create({
     model: "gpt-4o",

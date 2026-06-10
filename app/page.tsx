@@ -110,7 +110,7 @@ const CLOSED_QUESTIONS: Array<{
 ];
 
 const OPEN_QUESTIONS: Array<{
-  id: "q6" | "q7" | "q8";
+  id: "q6" | "q7";
   label: string;
   text: string;
   hint: string;
@@ -118,52 +118,35 @@ const OPEN_QUESTIONS: Array<{
 }> = [
   {
     id: "q6",
-    label: "Q6 — Diagnóstico do Problema",
-    text: "Considerando os usos que você identificou acima: qual era o problema, gargalo ou ineficiência que existia antes? O que tornava esse processo custoso, lento ou propenso a erros?",
-    hint: "Seja específico. Indique o tempo gasto ou a frequência com que o problema ocorria (ex: 'Gastava 6h toda sexta consolidando planilhas manuais...').",
+    label: "Q6 — Os 3 melhores usos",
+    text: "Descreva brevemente os 3 melhores usos individuais de IA que você fez ao longo do ano. Para cada um: qual era o problema ou gargalo, o que você implementou e qual foi o resultado (com número ou dado concreto).",
+    hint: "Seja objetivo em cada uso. Ex: '1. Automatizei extração de covenants em PDFs de debêntures → revisão caiu de 3 dias para 6h/mês. 2. ...'",
     rationale: {
-      dimension: "Baseline quantificável — existência real do problema",
+      dimension: "Amplitude e consistência do portfólio individual de IA",
       purpose:
-        "Toda reivindicação de impacto exige um before/after falsificável. Q6 é o débito (custo do problema), Q8 é o crédito (ganho da solução). Sem baseline quantificado com frequência, horas ou custo específico — qualquer ganho declarado em Q8 vira narrativa sem âncora.",
+        "Pedir os 3 melhores usos força o colaborador a selecionar e priorizar, revelando o teto de maturidade real. Um único uso pode ser pontual ou atípico; três usos mostram padrão. O before/after de cada um fornece o baseline quantificável necessário para auditoria.",
       signal:
-        "O avaliador usa Q6 para verificar se o case foi construído com metodologia ou inventado retrospectivamente. A especificidade do problema é diretamente proporcional à credibilidade do restante.",
+        "A diversidade dos 3 usos revela se o colaborador aplica IA apenas em um nicho ou de forma transversal. Três usos do mesmo tipo (ex: três revisões de e-mail) sinalizam adoção superficial.",
       flagRisk: [
-        "Resposta sem número ou frequência específica aciona a flag resposta_generica → rebaixamento automático de –0,5 ponto.",
-        "Problema incompatível com a área/cargo do colaborador aciona incoerencia_escopo.",
+        "Usos sem resultado numérico ou dado concreto acionam resposta_generica.",
+        "Usos incompatíveis com cargo/área acionam incoerencia_escopo.",
       ],
     },
   },
   {
     id: "q7",
-    label: "Q7 — Racional e Mecânica de Uso",
-    text: "Qual foi o racional para escolher essa abordagem de IA? Explique o passo a passo da solução: qual ferramenta, como foi configurada, o que entra como input, o que sai como output e qual regra de negócio está embarcada.",
-    hint: "Evite respostas vagas como 'usei o ChatGPT para me ajudar'. Explique a mecânica e o porquê da escolha: ferramenta, estrutura de prompt/Skill, input, output, regra embarcada.",
+    label: "Q7 — Mecânica do uso de maior impacto",
+    text: "Escolha o uso de maior impacto dos três e detalhe a mecânica: qual ferramenta, como configurou, o que entra como input, o que sai como output e qual regra de negócio está embarcada.",
+    hint: "Evite 'usei o ChatGPT para me ajudar'. Explique o passo a passo: ferramenta (ex: Skill no Claude, GPT customizado, script Python), estrutura do prompt ou automação, input, output, regra embarcada.",
     rationale: {
       dimension: "Domínio técnico real — o colaborador é dono ou apenas operador?",
       purpose:
-        "Quem não consegue explicar a mecânica não é dono da solução. Em setor regulado (CVM), isso é risco de governança. Além disso, Q7 bem escrita é documentação técnica reutilizável — as melhores alimentam a biblioteca interna de Skills da Suno.",
+        "Quem não consegue explicar a mecânica não é dono da solução. Em setor regulado (CVM), isso é risco de governança. Q7 bem escrita é documentação técnica reutilizável — as melhores alimentam a biblioteca interna de Skills da Suno.",
       signal:
         "É a pergunta que mais diferencia Top 20% de Mediana: Mediana descreve uso; Top descreve arquitetura e racional.",
       flagRisk: [
         "Ausência de ferramenta específica, regra de negócio ou formato de input/output aciona ausencia_mecanica → nota travada em 1,0.",
         "Resposta que parece gerada por IA genérica sem conteúdo factual da rotina é marcada para auditoria manual.",
-      ],
-    },
-  },
-  {
-    id: "q8",
-    label: "Q8 — Evidência de Impacto",
-    text: "Descreva a situação atual do processo após a implementação. Quais foram os ganhos tangíveis de tempo (horas liberadas), de qualidade do output ou de redução de custos?",
-    hint: "O impacto deve ser proporcional à sua cadeira. Estagiário: foque nas horas economizadas na sua rotina. Analista/Gestor: foque no impacto do processo da subárea.",
-    rationale: {
-      dimension: "ROI individual proporcional ao cargo e à chave de indicador",
-      purpose:
-        "Esta pergunta fecha o circuito econômico do formulário. O somatório de Q8 de 300 colaboradores, após auditoria, é o número que a Suno usará para defender o investimento em IA perante o Conselho.",
-      signal:
-        "Cases com Q8 robusta em chaves de Receita/EBITDA são candidatos ao Painel do Jean como exemplos de replicação cross-BU.",
-      flagRisk: [
-        "Diretor declarando '2h economizadas em revisão de e-mail' → impacto pequeno demais para o cargo → incoerencia_escopo.",
-        "Ausência de número concreto → resposta_generica.",
       ],
     },
   },
@@ -224,7 +207,6 @@ type FormState = {
   q5: ClosedAnswer | "";
   q6: string;
   q7: string;
-  q8: string;
   gestor_papel: PapelColaborador | "";
   gestor_amplitude: AmplitudeSolucao | "";
   gestor_nota_case: GestorScore | 0;
@@ -234,7 +216,7 @@ type FormState = {
 const EMPTY_FORM: FormState = {
   cargo: "", nivel: "pleno",
   q1: "", q2: "", q3: "", q4: "", q5: "",
-  q6: "", q7: "", q8: "",
+  q6: "", q7: "",
   gestor_papel: "",
   gestor_amplitude: "",
   gestor_nota_case: 0,
@@ -261,14 +243,14 @@ export default function SniperForm() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function setOpenAnswer(key: "q6" | "q7" | "q8", value: string) {
+  function setOpenAnswer(key: "q6" | "q7", value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
   function isFormValid(): boolean {
     if (!form.cargo.trim()) return false;
     const closedComplete = (["q1", "q2", "q3", "q4", "q5"] as const).every((k) => form[k] !== "");
-    const openComplete = (["q6", "q7", "q8"] as const).every((k) => form[k].trim().length >= 50);
+    const openComplete = (["q6", "q7"] as const).every((k) => form[k].trim().length >= 50);
     const gestorComplete =
       form.gestor_papel !== "" &&
       form.gestor_amplitude !== "" &&
@@ -300,7 +282,6 @@ export default function SniperForm() {
       q5: form.q5 as ClosedAnswer,
       q6: form.q6,
       q7: form.q7,
-      q8: form.q8,
       gestor_papel: form.gestor_papel as PapelColaborador,
       gestor_amplitude: form.gestor_amplitude as AmplitudeSolucao,
       gestor_nota_case: form.gestor_nota_case as GestorScore,
@@ -441,17 +422,6 @@ export default function SniperForm() {
               <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
                 Diagnóstico, Racional e Impacto — preenchido pelo colaborador
               </span>
-            </div>
-
-            {/* Ancoragem — top 3 usos */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
-              <p className="text-sm font-semibold text-amber-900 mb-1">
-                Antes de responder, pense nos seus 3 melhores usos individuais de IA ao longo do ano.
-              </p>
-              <p className="text-xs text-amber-700 leading-relaxed">
-                Quais foram as 3 vezes em que você fez o uso mais relevante de IA por conta própria — não em grupo, não por iniciativa do seu gestor, mas algo que você mesmo identificou, construiu ou implementou?
-                As perguntas abaixo devem ser respondidas com base nesses usos. Se um deles se destacar claramente dos demais, foque nele.
-              </p>
             </div>
 
             <div className="space-y-6">
@@ -673,7 +643,7 @@ export default function SniperForm() {
           <div className="flex flex-col items-end gap-3 pb-12">
             {!isFormValid() && (
               <p className="text-xs text-gray-400">
-                Preencha todas as seções: questões fechadas, respostas abertas (mín. 50 caracteres) e avaliação do gestor.
+                Preencha todas as seções: questões fechadas, respostas abertas Q6 e Q7 (mín. 50 caracteres cada) e avaliação do gestor.
               </p>
             )}
             <button

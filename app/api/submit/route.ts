@@ -14,10 +14,10 @@ export async function POST(req: NextRequest) {
   }
 
   // Validate open-ended fields (Part B)
-  const openFields = [form.q6, form.q7, form.q8];
+  const openFields = [form.q6, form.q7];
   if (openFields.some((f) => !f || f.trim().length < 50)) {
     return NextResponse.json(
-      { error: "Respostas abertas (Q6–Q8) precisam ter no mínimo 50 caracteres cada." },
+      { error: "Respostas abertas (Q6–Q7) precisam ter no mínimo 50 caracteres cada." },
       { status: 422 }
     );
   }

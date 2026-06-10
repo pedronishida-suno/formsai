@@ -119,7 +119,7 @@ const OPEN_QUESTIONS: Array<{
   {
     id: "q6",
     label: "Q6 — Diagnóstico do Problema",
-    text: "Descreva com precisão o problema, gargalo ou ineficiência que existia na sua rotina antes da aplicação da IA. O que tornava esse processo custoso, lento ou propenso a erros?",
+    text: "Considerando os usos que você identificou acima: qual era o problema, gargalo ou ineficiência que existia antes? O que tornava esse processo custoso, lento ou propenso a erros?",
     hint: "Seja específico. Indique o tempo gasto ou a frequência com que o problema ocorria (ex: 'Gastava 6h toda sexta consolidando planilhas manuais...').",
     rationale: {
       dimension: "Baseline quantificável — existência real do problema",
@@ -441,6 +441,17 @@ export default function SniperForm() {
               <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
                 Diagnóstico, Racional e Impacto — preenchido pelo colaborador
               </span>
+            </div>
+
+            {/* Ancoragem — top 3 usos */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
+              <p className="text-sm font-semibold text-amber-900 mb-1">
+                Antes de responder, pense nos seus 3 melhores usos individuais de IA ao longo do ano.
+              </p>
+              <p className="text-xs text-amber-700 leading-relaxed">
+                Quais foram as 3 vezes em que você fez o uso mais relevante de IA por conta própria — não em grupo, não por iniciativa do seu gestor, mas algo que você mesmo identificou, construiu ou implementou?
+                As perguntas abaixo devem ser respondidas com base nesses usos. Se um deles se destacar claramente dos demais, foque nele.
+              </p>
             </div>
 
             <div className="space-y-6">
